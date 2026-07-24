@@ -5,6 +5,12 @@ single source of truth for **who owns what** and **how we avoid stepping on each
 other**. It is committed so both of us see the same copy — unlike `tasks/`, which is
 gitignored and local-only.
 
+**Branch naming (updated):** `phase-1` and `phase-2` replace the old `feat/remediation`
+/ `feat/evidence` names below. The split is still by **domain**, not by spec phase
+number — `phase-1` owns the product core (`src/`), `phase-2` owns the sponsor
+evidence layer (`scripts/`) and the dashboard (`dashboard/`). Any `feat/remediation`
+or `feat/evidence` reference below means `phase-1` / `phase-2` respectively.
+
 Framing rule applies to everything either of us writes or says: reviewable patches
 with verification evidence. Never "compliant" / "fully accessible". See `tracker.md` §Framing.
 
@@ -27,23 +33,30 @@ branch (see Step 0).
 Both branches depend on these. Doing them first prevents the two worst merge
 conflicts (lockfile + type contract).
 
-- [ ] **Hiuyan:** commit Phase 1, push `main` to GitHub. (`gh auth login` first — auth is currently broken.)
-- [ ] **Hiuyan:** freeze `targets.json` — probe candidates with
-      `npx tsx scripts/probe-targets.ts <url>...`, pick 5 that load fast, are genuinely
-      broken, and have no login wall. Commit.
-- [ ] **Hiuyan:** extend `src/types.ts` with the Phase 2/3 shapes (`Patch`, `PatchResult`,
-      `VerifyResult`, `RemediationReport`) so both branches build against stable types.
+- [x] **Hiuyan:** commit Phase 1, push `main` to GitHub. `gh` is still not installed
+      locally (`brew install gh && gh auth login`, run by hand) — it isn't needed
+      again until Phase 3's `gh pr create`.
+- [x] **Hiuyan:** freeze `targets.json` — probed 8 candidates with
+      `npx tsx scripts/probe-targets.ts <url>...`, committed the 5 that load fast
+      and are genuinely broken (urbannava.gov, mdfoodbank.org, comlib.org,
+      communitylibrary.net/post-falls, cs.ox.ac.uk). Replaced gov.uk, which only
+      had 2 axe violations and didn't fit spec §9's "genuinely broken" bar.
+- [x] **Hiuyan:** `src/types.ts` already carries the Phase 2/3 shapes (`Patch`,
+      `PatchResult`, `VerifyResult`, `RemediationReport`) — frozen, both branches
+      build against it as-is.
 - [ ] **Together:** install every dep both branches need **now**, in one commit, so the
       lockfile doesn't conflict later:
       `npm i elevenlabs braintrust @daytonaio/sdk` *(confirm real package names from each
-      sponsor's docs before running — do not trust these strings)*.
+      sponsor's docs before running — do not trust these strings; P2.1/`/browse` covers this)*.
 - [ ] **Teammate:** install the **CodeRabbit** GitHub app on the repo (2 min, highest
-      cash-per-minute). Needs `main` pushed first.
-- [ ] Both `git pull` main, then cut your branch.
+      cash-per-minute). Needs `main` pushed first — it is.
+- [x] `phase-1` is cut from `main` and current. `phase-2` still needs to be cut by
+      whoever picks up the sponsor evidence layer — same starting point (`main`
+      at the target-freeze commit).
 
 ---
 
-## Branch A — `feat/remediation` (Hiuyan) — the product core
+## Branch A — `phase-1` (Hiuyan) — the product core
 
 Phases 2 & 3. This is the demo. Detailed hands-on plan (with verify lines + tags) is in
 your local `tasks/todo.md`.
@@ -61,7 +74,7 @@ opens PRs — that's the product's deliverable, the thing CodeRabbit reviews on 
 
 ---
 
-## Branch B — `feat/evidence` (Teammate) — the sponsor evidence layer
+## Branch B — `phase-2` (Teammate) — the sponsor evidence layer
 
 Everything here reads `out/*.json` (Phase 1 output, already committed as fixtures) or a
 `RemediationReport` once A produces one. **You never touch `src/index.ts`** — each feature
@@ -93,11 +106,14 @@ CopilotKit (§7.6) and WorkOS (§7.7): **skip** unless we're ahead at 2:15.
 
 ## Integration checkpoints
 
+Note: "Phase 2" / "Phase 3" below are spec phases (§5, §6), not the `phase-1` /
+`phase-2` branch names — both happen on the `phase-1` branch.
+
 | by | state |
 |---|---|
 | +0:15 | Step 0 done, both on branches |
-| Phase 2 green (A) | violations fall AND comprehension rises on one site — **screenshot immediately** |
-| A merges Phase 2 | B re-points Braintrust/audio at real remediated numbers |
-| Phase 3 green (A) | real PR open, CodeRabbit comment appears — screenshot |
+| Phase 2 green (`phase-1`) | violations fall AND comprehension rises on one site — **screenshot immediately** |
+| `phase-1` merges Phase 2 work | `phase-2` re-points Braintrust/audio at real remediated numbers |
+| Phase 3 green (`phase-1`) | real PR open, CodeRabbit comment appears — screenshot |
 | +2:00 all merged | main runs end-to-end across 5 targets |
 | **3:00** | **STOP BUILDING** |
