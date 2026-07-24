@@ -9,7 +9,7 @@
     "sandbox": "tsx scripts/sandbox.ts",
     "typecheck": "tsc --noEmit",
     "test": "echo \"no tests yet\" && exit 0",
-    "dashboard": "echo \"dashboard not built yet\" && exit 0"
+    "dashboard": "tsx scripts/dashboard.ts"
   },
   "repository": {
     "type": "git",

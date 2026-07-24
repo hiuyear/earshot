@@ -29,3 +29,10 @@ Official SDKs are not automatically the right dependency if they bring an unfixe
 security finding into a small demo repo. Daytona's SDK installed successfully, but
 `npm audit --omit=dev` showed 3 high-severity findings through OpenTelemetry. The
 REST smoke path still proves isolated execution and keeps the dependency tree clean.
+
+## 2026-07-24 — Dashboard as presentation only
+
+The static dashboard is not another pipeline stage. It reads existing artifacts and
+makes them easier to screenshot: remediation numbers, Braintrust metrics, Daytona
+sandbox proof, and audio/text outputs. The source of truth remains the saved JSON
+reports and sponsor evidence files.

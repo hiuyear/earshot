@@ -146,6 +146,20 @@ dropped by the same rule as Grader B.
 - **Interview line:** "I used Daytona where isolation matters, but kept it downstream
   and optional so a sponsor integration could not make the core build less safe."
 
+### D12 — Static dashboard generated from local evidence artifacts
+- **Alternatives:**
+  - *Build a live app/dashboard* — better interaction, but adds framework/setup time and
+    distracts from the sponsor evidence scripts.
+  - *Generate `dashboard/index.html` from local artifacts* (chosen) — static and simple,
+    but immediately screenshot-able and works without a dev server.
+- **Why for this project:** Phase 2 evidence already lives in local JSON/text artifacts;
+  a generated HTML page is the quickest way to make those artifacts legible for the
+  video and Devpost without changing the core pipeline.
+- **Evidence:** `npm run dashboard` writes `dashboard/index.html` from report,
+  Braintrust, Daytona, and audio/narration artifacts.
+- **Interview line:** "The dashboard is just a presentation layer over saved evidence;
+  it does not become another source of truth."
+
 ## Framing guardrails (hard requirement, spec §8)
 Never "automatically compliant" / "WCAG compliant" / "fully accessible". This project
 produces **reviewable patches with verification evidence**; an agent proposes, a human
