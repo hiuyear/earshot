@@ -44,3 +44,10 @@ MP3s because the SDK returned a Blob-like response instead of the Node stream sh
 the docs snippet. The robust fix was to handle all reasonable binary shapes: Node
 streams, Web streams, Blob/ArrayBuffer, and Uint8Array, plus a timeout so generation
 cannot hang silently.
+
+## 2026-07-24 — Phase 3 branch ids
+
+The first Phase 3 rerun failed to open a PR because CLI URL scans used the generic
+target id `adhoc`, so every demo tried to push `fix/a11y-adhoc`. The fix was to derive
+the target id from the URL hostname and add a timestamp to emitted fix branches. For
+demo artifacts, uniqueness beats pretty branch names.

@@ -15,7 +15,7 @@ and later `dashboard/`).
 |---|---|---|
 | 1 — Audit + Narrate + Judge | **GREEN (Grader B pending key)** | Live run on gov.uk: 2 violations, 150-line narration w/ 4 gaps, state saved to `out/`. Judge code complete; needs `FIREWORKS_API_KEY` for the score line. |
 | 2 — Fix + prove improvement | **YELLOW (loop wired, needs improving patch/key)** | `feat/remediation` runs scan → plan → apply → verify. Live gov.uk run caught unsafe region patches, reverted them, and ended with `2 → 2`, `+0` added keys. Grader B still needs `FIREWORKS_API_KEY`. |
-| 3 — Emit reviewable patch | not started | — |
+| 3 — Emit reviewable patch | **GREEN (PR opened; remediation outcome weak)** | `npm run audit -- https://urbannava.gov/` emitted `patches/urbannava-gov/`, pushed `fix/a11y-urbannava-gov-20260724-215627`, and opened PR #5. Axe stayed `64 → 64`; Grader B moved `3/5 → 4/5`. |
 
 ## Data model (Phase 1)
 
@@ -170,6 +170,20 @@ dropped by the same rule as Grader B.
   Braintrust, Daytona, and audio/narration artifacts.
 - **Interview line:** "The dashboard is just a presentation layer over saved evidence;
   it does not become another source of truth."
+
+### D13 — Unique Phase 3 fix branches from URL-derived target ids
+- **Alternatives:**
+  - *Always use `adhoc` for CLI URL runs* — simple, but repeated live demos collide on
+    `fix/a11y-adhoc` and remote pushes fail non-fast-forward.
+  - *Derive target id from the URL hostname and timestamp fix branches* (chosen) —
+    slightly noisier branch names, but repeated demo runs can always push/open PRs.
+- **Why for this project:** Phase 3 is a live demo surface. A branch collision should
+  not block the evidence moment, especially when multiple teammates may rerun the same
+  URL during the hackathon.
+- **Evidence:** After the change, Urbanna emitted branch
+  `fix/a11y-urbannava-gov-20260724-215627` and opened PR #5.
+- **Interview line:** "The emitted PR branch is an artifact id, not a long-lived branch;
+  uniqueness matters more than pretty names for repeatable demos."
 
 ## Framing guardrails (hard requirement, spec §8)
 Never "automatically compliant" / "WCAG compliant" / "fully accessible". This project
