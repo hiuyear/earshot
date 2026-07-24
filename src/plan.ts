@@ -1,4 +1,6 @@
+import type { Page } from 'playwright';
 import type { FlaggedItem, Patch, Violation } from './types';
+import { planLLMPatches, logLLMStats, type LLMStats } from './llm';
 
 export type PatchPlan = {
   patches: Patch[];
@@ -118,4 +120,27 @@ export function planDeterministicPatches(violations: Violation[]): PatchPlan {
   }
 
   return { patches: dedupe(patches), flaggedItems };
+}
+
+/**
+ * Full planner: deterministic tier (zero model calls) + LLM tier for everything
+ * that needs semantic judgment (spec §5b). The LLM tier supersedes the
+ * deterministic tier's HUMAN_RULES flags — it either fixes them with routed
+ * Fireworks calls or flags them with a specific reason, so a flagged item here
+ * always carries a real "why," never a blanket "not attempted."
+ */
+export async function planPatches(
+  page: Page,
+  violations: Violation[],
+): Promise<PatchPlan & { stats: LLMStats }> {
+  const deterministic = planDeterministicPatches(violations);
+  const llm = await planLLMPatches(page, violations);
+
+  logLLMStats('this site', llm.stats, llm.flaggedItems.length, llm.patches.length);
+
+  return {
+    patches: dedupe([...deterministic.patches, ...llm.patches]),
+    flaggedItems: llm.flaggedItems,
+    stats: llm.stats,
+  };
 }

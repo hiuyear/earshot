@@ -2,7 +2,7 @@ import 'dotenv/config';
 import { readFileSync, mkdirSync, writeFileSync } from 'node:fs';
 import { launch, open, scanPage } from './scan';
 import { judge } from './judge';
-import { planDeterministicPatches } from './plan';
+import { planPatches } from './plan';
 import { applyPatches, revertPatches } from './patch';
 import { verifyRemediation } from './verify';
 import type { RemediationReport, SiteReport, Target } from './types';
@@ -47,7 +47,7 @@ async function remediateTarget(
     await open(page, target.url);
     const scan = await scanPage(page);
     const before = await makeSiteReport(target, scan);
-    const plan = planDeterministicPatches(before.violations);
+    const plan = await planPatches(page, before.violations);
     let patchResults = await applyPatches(page, plan.patches);
     let verification = await verifyRemediation(page, target, before);
 
