@@ -1,0 +1,29 @@
+--- patches/csox/before.html	2026-07-24 16:12:28
++++ patches/csox/after.html	2026-07-24 16:12:28
+@@ -617,7 +617,7 @@
+                         </div>
+ 		
+ 		</div>
+-                <div class="col-xs-12 equal-text-height">
++                <div class="col-xs-12 equal-text-height" style="">
+                     <div class="hero-text">
+                         <h2 class="text-uppercase">OUR WORLD-CLASS RESEARCH</h2>
+                         <p>
+@@ -702,7 +702,7 @@
+                         </div>
+ 		
+ 		</div>
+-                <div class="col-xs-12 equal-text-height">
++                <div class="col-xs-12 equal-text-height" style="height: 353px;">
+                     <div class="hero-text">
+                         <h2 class="text-uppercase">Study with us</h2>
+                         <p>
+@@ -742,7 +742,7 @@
+                 	</div>
+ 		 </div>
+ 	    
+-                <div class="col-xs-12 equal-text-height">
++                <div class="col-xs-12 equal-text-height" style="height: 353px;">
+                     <div class="hero-text">
+                         <h2 class="text-uppercase">Meet our people</h2>
+                         <p>
