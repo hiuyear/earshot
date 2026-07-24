@@ -13,7 +13,7 @@ contribution — judge a page from *only* the linear screen-reader output).
 | Phase | State | Evidence |
 |---|---|---|
 | 1 — Audit + Narrate + Judge | **GREEN (Grader B pending key)** | Live run on gov.uk: 2 violations, 150-line narration w/ 4 gaps, state saved to `out/`. Judge code complete; needs `FIREWORKS_API_KEY` for the score line. |
-| 2 — Fix + prove improvement | not started | — |
+| 2 — Fix + prove improvement | **YELLOW (loop wired, needs improving patch/key)** | `feat/remediation` runs scan → plan → apply → verify. Live gov.uk run caught unsafe region patches, reverted them, and ended with `2 → 2`, `+0` added keys. Grader B still needs `FIREWORKS_API_KEY`. |
 | 3 — Emit reviewable patch | not started | — |
 
 ## Data model (Phase 1)
@@ -22,6 +22,10 @@ contribution — judge a page from *only* the linear screen-reader output).
 `Narration { lines[], transcript, gapCount, truncated }`. All in `src/types.ts`.
 Raw axe JSON is reduced to `Violation` at the audit boundary — no raw axe object
 escapes `audit()` (token-budget correctness, not optimisation).
+
+Phase 2 adds `RemediationReport { before, after, patches, patchResults, flaggedItems, verify }`.
+`Patch` is a Zod-validated discriminated union so LLM patch output can be parsed or
+dropped by the same rule as Grader B.
 
 ## Architectural decisions
 
@@ -62,6 +66,39 @@ escapes `audit()` (token-budget correctness, not optimisation).
   serverless id. Docs caveat: json_object mode requires also instructing JSON in the
   prompt or the model streams whitespace — done. Raw output never trusted: safeParse
   or the score is dropped, never coerced.
+
+### D6 — Freeze a shared remediation contract before branch work
+- **Alternatives:**
+  - *Ad hoc objects per file* — faster to start, but Branch A/Branch B drift immediately.
+  - *Shared `RemediationReport` + `Patch` types in `src/types.ts`* (chosen) — costs a
+    few minutes up front, but gives the teammate/scripts one stable JSON contract.
+- **Why for this project:** this is a two-person hackathon repo; stable local JSON is
+  the integration boundary, so the type contract is the cheapest way to avoid merge
+  and interpretation bugs.
+- **Interview line:** "The shared type was the branch boundary: code can move fast
+  because the evidence JSON shape is frozen."
+
+### D7 — Verify full violation sets and rollback on regression
+- **Alternatives:**
+  - *Keep any count-neutral/count-improving patch* — demos better numbers, but can hide
+    new accessibility failures.
+  - *Apply, rescan, compare `violationKeys`, rollback if new keys appear* (chosen) —
+    slower and sometimes ends with no improvement, but never silently ships a worse page.
+- **Why for this project:** a live gov.uk run proved the need: a naive `region` fix
+  changed `2 → 5`; the rollback returned the final state to `+0` added keys.
+- **Interview line:** "The verifier is allowed to reject the agent's own fix; that is
+  what separates reviewable remediation from an overlay."
+
+### D8 — Temporary demo target freeze: gov.uk + example fallback
+- **Alternatives:**
+  - *Spend time freezing five targets now* — better dataset story, but risks burning
+    the core Phase 2 window.
+  - *Use the Phase 1-verified gov.uk target and keep example.com as fallback* (chosen)
+    — smaller demo surface, but lets the remediation loop be debugged immediately.
+- **Why for this project:** Phase 2 correctness gates the sponsor/evidence layer; one
+  known-loading target is enough to prove the loop before expanding the dataset.
+- **Interview line:** "I froze the smallest target set that protected the demo path,
+  then left dataset expansion as a separate sponsor/evidence task."
 
 ## Framing guardrails (hard requirement, spec §8)
 Never "automatically compliant" / "WCAG compliant" / "fully accessible". This project
