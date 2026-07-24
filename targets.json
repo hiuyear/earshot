@@ -1,7 +1,9 @@
 {
-  "note": "Frozen target list. Real orgs, sympathetic, mostly static, no login wall. Vet with `npx tsx scripts/probe-targets.ts <url>` before freezing. `fallbacks` are known-good stand-ins if a primary hangs on the day.",
+  "note": "Frozen demo target list. Gov.uk was verified in Phase 1; example.com remains a smoke-test fallback.",
   "targets": [
-    { "id": "example", "url": "https://example.com", "label": "IANA example page (smoke-test placeholder)" }
+    { "id": "govuk", "url": "https://www.gov.uk/", "label": "GOV.UK homepage" }
   ],
-  "fallbacks": []
+  "fallbacks": [
+    { "id": "example", "url": "https://example.com", "label": "IANA example page (smoke-test fallback)" }
+  ]
 }

@@ -86,3 +86,83 @@ export type SiteReport = {
   judgment: Judgment | null;
   judgeError: string | null;
 };
+
+/**
+ * Phase 2/3 remediation contract.
+ *
+ * This is the shared branch boundary: Branch A can generate/apply patches while
+ * Branch B can read the resulting reports without importing Playwright code.
+ */
+const BasePatchSchema = z.object({
+  violationId: z.string(),
+  selector: z.string(),
+  html: z.string().optional(),
+  reasoning: z.string(),
+});
+
+export const PatchSchema = z.discriminatedUnion('action', [
+  BasePatchSchema.extend({
+    action: z.literal('setAttribute'),
+    attribute: z.string(),
+    value: z.string(),
+  }),
+  BasePatchSchema.extend({
+    action: z.literal('setText'),
+    value: z.string(),
+  }),
+  z.object({
+    action: z.literal('setLang'),
+    violationId: z.string(),
+    value: z.string(),
+    reasoning: z.string(),
+  }),
+  z.object({
+    action: z.literal('insertSkipLink'),
+    violationId: z.string(),
+    selector: z.string().default('body'),
+    href: z.string().default('#main'),
+    text: z.string().default('Skip to main content'),
+    reasoning: z.string(),
+  }),
+  BasePatchSchema.extend({
+    action: z.literal('flag_for_human'),
+    reason: z.string(),
+  }),
+]);
+
+export type Patch = z.infer<typeof PatchSchema>;
+export type PatchAction = Patch['action'];
+
+export type FlaggedItem = Extract<Patch, { action: 'flag_for_human' }>;
+
+export type PatchResult = {
+  patch: Patch;
+  ok: boolean;
+  reason: string | null;
+  reverted: boolean;
+  previousValue?: string | null;
+  previousText?: string | null;
+  inserted?: boolean;
+};
+
+export type VerifyResult = {
+  beforeViolationCount: number;
+  afterViolationCount: number;
+  removedViolationKeys: string[];
+  addedViolationKeys: string[];
+  beforeJudgment: Judgment | null;
+  afterJudgment: Judgment | null;
+  beforeJudgeError: string | null;
+  afterJudgeError: string | null;
+};
+
+export type RemediationReport = {
+  target: Target;
+  fetchedAt: string;
+  before: SiteReport;
+  after: SiteReport;
+  patches: Patch[];
+  patchResults: PatchResult[];
+  flaggedItems: FlaggedItem[];
+  verify: VerifyResult;
+};
