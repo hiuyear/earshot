@@ -1,23 +1,25 @@
 {
-  "name": "daytona-hackathon",
+  "name": "earshot",
   "version": "1.0.0",
   "description": "Finds websites blind users cannot navigate, generates reviewable patches, and verifies each fix by listening to the page.",
   "scripts": {
     "audit": "tsx src/index.ts",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "test": "echo \"no tests yet\" && exit 0",
+    "dashboard": "echo \"dashboard not built yet\" && exit 0"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/hiuyear/daytona-hackathon.git"
+    "url": "git+https://github.com/the-builders-burrow/earshot.git"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "type": "module",
   "bugs": {
-    "url": "https://github.com/hiuyear/daytona-hackathon/issues"
+    "url": "https://github.com/the-builders-burrow/earshot/issues"
   },
-  "homepage": "https://github.com/hiuyear/daytona-hackathon#readme",
+  "homepage": "https://github.com/the-builders-burrow/earshot#readme",
   "devDependencies": {
     "@types/node": "^26.1.1",
     "tsx": "^4.23.1",

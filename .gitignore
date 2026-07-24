@@ -2,7 +2,8 @@ node_modules/
 tasks/
 .env
 .env.local
-out/
+out/*
+!out/*.json
 patches/
 *.log
 .DS_Store
