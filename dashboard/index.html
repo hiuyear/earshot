@@ -29,41 +29,127 @@
 <main>
   <h1>Earshot Evidence Dashboard</h1>
   <p class="muted">Reviewable patches with verification evidence. This dashboard does not claim compliance.</p>
-  <p class="warning">Generated from local artifacts at 2026-07-24T21:30:01.769Z.</p>
+  <p class="warning">Generated from local artifacts at 2026-07-24T22:06:34.238Z.</p>
 
   <h2>Remediation Report</h2>
   <section class="grid">
         <article class="card">
-          <h3>https://www.gov.uk/</h3>
-          <p class="muted">https://www.gov.uk/</p>
+          <h3>Town of Urbanna, VA (local government)</h3>
+          <p class="muted">https://urbannava.gov/</p>
           <div class="metrics">
-            <div><strong>2 -> 2</strong><span>Axe violations</span></div>
-            <div><strong>-0 +0</strong><span>Violation keys</span></div>
-            <div><strong>skipped -> skipped</strong><span>Comprehension</span></div>
-            <div><strong>0</strong><span>Flagged for human</span></div>
+            <div role="group" aria-label="Axe violations: 64 to 64"><strong aria-hidden="true">64 -> 64</strong><span aria-hidden="true">Axe violations</span></div>
+            <div role="group" aria-label="Violation keys: 0 removed, 0 added"><strong aria-hidden="true">-0 +0</strong><span aria-hidden="true">Violation keys</span></div>
+            <div role="group" aria-label="Comprehension: 3 to 3"><strong aria-hidden="true">3 -> 3</strong><span aria-hidden="true">Comprehension</span></div>
+            <div role="group" aria-label="Flagged for human: 1"><strong aria-hidden="true">1</strong><span aria-hidden="true">Flagged for human</span></div>
+          </div>
+        </article>
+
+        <article class="card">
+          <h3>Maryland Food Bank (nonprofit)</h3>
+          <p class="muted">https://mdfoodbank.org/</p>
+          <div class="metrics">
+            <div role="group" aria-label="Axe violations: 58 to 58"><strong aria-hidden="true">58 -> 58</strong><span aria-hidden="true">Axe violations</span></div>
+            <div role="group" aria-label="Violation keys: 3 removed, 3 added"><strong aria-hidden="true">-3 +3</strong><span aria-hidden="true">Violation keys</span></div>
+            <div role="group" aria-label="Comprehension: 4 to 4"><strong aria-hidden="true">4 -> 4</strong><span aria-hidden="true">Comprehension</span></div>
+            <div role="group" aria-label="Flagged for human: 3"><strong aria-hidden="true">3</strong><span aria-hidden="true">Flagged for human</span></div>
+          </div>
+        </article>
+
+        <article class="card">
+          <h3>Community Library (nonprofit library)</h3>
+          <p class="muted">https://comlib.org/</p>
+          <div class="metrics">
+            <div role="group" aria-label="Axe violations: 36 to 36"><strong aria-hidden="true">36 -> 36</strong><span aria-hidden="true">Axe violations</span></div>
+            <div role="group" aria-label="Violation keys: 0 removed, 0 added"><strong aria-hidden="true">-0 +0</strong><span aria-hidden="true">Violation keys</span></div>
+            <div role="group" aria-label="Comprehension: 4 to 4"><strong aria-hidden="true">4 -> 4</strong><span aria-hidden="true">Comprehension</span></div>
+            <div role="group" aria-label="Flagged for human: 0"><strong aria-hidden="true">0</strong><span aria-hidden="true">Flagged for human</span></div>
+          </div>
+        </article>
+
+        <article class="card">
+          <h3>Post Falls Community Library (community library)</h3>
+          <p class="muted">https://communitylibrary.net/library/post-falls/</p>
+          <div class="metrics">
+            <div role="group" aria-label="Axe violations: 8 to 6"><strong aria-hidden="true">8 -> 6</strong><span aria-hidden="true">Axe violations</span></div>
+            <div role="group" aria-label="Violation keys: 2 removed, 0 added"><strong aria-hidden="true">-2 +0</strong><span aria-hidden="true">Violation keys</span></div>
+            <div role="group" aria-label="Comprehension: 5 to 4"><strong aria-hidden="true">5 -> 4</strong><span aria-hidden="true">Comprehension</span></div>
+            <div role="group" aria-label="Flagged for human: 0"><strong aria-hidden="true">0</strong><span aria-hidden="true">Flagged for human</span></div>
+          </div>
+        </article>
+
+        <article class="card">
+          <h3>Oxford Computer Science (university department)</h3>
+          <p class="muted">https://www.cs.ox.ac.uk/</p>
+          <div class="metrics">
+            <div role="group" aria-label="Axe violations: 19 to 19"><strong aria-hidden="true">19 -> 19</strong><span aria-hidden="true">Axe violations</span></div>
+            <div role="group" aria-label="Violation keys: 0 removed, 0 added"><strong aria-hidden="true">-0 +0</strong><span aria-hidden="true">Violation keys</span></div>
+            <div role="group" aria-label="Comprehension: 4 to 4"><strong aria-hidden="true">4 -> 4</strong><span aria-hidden="true">Comprehension</span></div>
+            <div role="group" aria-label="Flagged for human: 0"><strong aria-hidden="true">0</strong><span aria-hidden="true">Flagged for human</span></div>
           </div>
         </article></section>
 
   <h2>Braintrust Metrics</h2>
   <table>
+    <caption class="muted">Violations and Comprehension show axe violation count and Grader B's 1-5 narration comprehension score, each as before &#8594; after. Delta is the net change in violation count. Fix Rate is the share of proposed patches that were kept (not reverted). Flag Rate is the share of semantic violations the LLM tier declined to guess at and flagged for human review instead.</caption>
     <thead><tr><th>Target</th><th>Violations</th><th>Delta</th><th>No Regression</th><th>Fix Rate</th><th>Flag Rate</th><th>Comprehension</th></tr></thead>
     <tbody>
         <tr>
-          <td>adhoc</td>
-          <td>2 -> 2</td>
+          <td>urbannava</td>
+          <td>64 -> 64</td>
+          <td>0</td>
+          <td>yes</td>
+          <td>0%</td>
+          <td>2%</td>
+          <td>3 -> 3</td>
+        </tr>
+
+        <tr>
+          <td>mdfoodbank</td>
+          <td>58 -> 58</td>
+          <td>0</td>
+          <td>no</td>
+          <td>0%</td>
+          <td>11%</td>
+          <td>4 -> 4</td>
+        </tr>
+
+        <tr>
+          <td>comlib</td>
+          <td>36 -> 36</td>
           <td>0</td>
           <td>yes</td>
           <td>0%</td>
           <td>0%</td>
-          <td>skipped -> skipped</td>
+          <td>4 -> 4</td>
+        </tr>
+
+        <tr>
+          <td>postfalls</td>
+          <td>8 -> 6</td>
+          <td>2</td>
+          <td>yes</td>
+          <td>100%</td>
+          <td>0%</td>
+          <td>5 -> 4</td>
+        </tr>
+
+        <tr>
+          <td>csox</td>
+          <td>19 -> 19</td>
+          <td>0</td>
+          <td>yes</td>
+          <td>0%</td>
+          <td>0%</td>
+          <td>4 -> 4</td>
         </tr></tbody>
   </table>
 
   <h2>Daytona Sandbox Evidence</h2>
+  <p class="muted">One isolated sandbox per target, running an untrusted-execution scan. Sandbox is the Daytona sandbox id; Exit is the scan process's exit code (0 = ran successfully); the block below is its raw stdout/stderr.</p>
   <section class="grid">
         <article class="card">
           <h3>urbannava — daytona</h3>
-          <p><strong>Sandbox:</strong> be9c41d5-6e7f-42ef-8bd8-66fdddfe1cdc</p>
+          <p><strong>Sandbox:</strong> 5e4f9168-0db0-4f85-905a-29f5ffea22bd</p>
           <p><strong>Exit:</strong> 0</p>
           <pre>{&quot;isolated&quot;:true,&quot;targetId&quot;:&quot;urbannava&quot;,&quot;url&quot;:&quot;https://urbannava.gov/&quot;,&quot;runtime&quot;:&quot;v25.9.0&quot;}
 npm notice
@@ -75,10 +161,15 @@ npm notice
         </article></section>
 
   <h2>Audio / Narration Artifacts</h2>
-  <ul><li><a href="../out/audio/phase2-1784925995566-adhoc-after.mp3">out/audio/phase2-1784925995566-adhoc-after.mp3</a></li>
-<li><a href="../out/audio/phase2-1784925995566-adhoc-after.txt">out/audio/phase2-1784925995566-adhoc-after.txt</a></li>
-<li><a href="../out/audio/phase2-1784925995566-adhoc-before.mp3">out/audio/phase2-1784925995566-adhoc-before.mp3</a></li>
-<li><a href="../out/audio/phase2-1784925995566-adhoc-before.txt">out/audio/phase2-1784925995566-adhoc-before.txt</a></li></ul>
+  <ul><li><a href="../out/audio/csox-report-csox-after.mp3">out/audio/csox-report-csox-after.mp3</a></li>
+<li><a href="../out/audio/csox-report-csox-after.txt">out/audio/csox-report-csox-after.txt</a></li>
+<li><a href="../out/audio/csox-report-csox-before.mp3">out/audio/csox-report-csox-before.mp3</a></li>
+<li><a href="../out/audio/csox-report-csox-before.txt">out/audio/csox-report-csox-before.txt</a></li>
+<li><a href="../out/audio/phase2-1784929771346-urbannava-after.txt">out/audio/phase2-1784929771346-urbannava-after.txt</a></li>
+<li><a href="../out/audio/phase2-1784929771346-urbannava-before.txt">out/audio/phase2-1784929771346-urbannava-before.txt</a></li>
+<li><a href="../out/audio/urbannava-report-urbannava-after.txt">out/audio/urbannava-report-urbannava-after.txt</a></li>
+<li><a href="../out/audio/urbannava-report-urbannava-before.mp3">out/audio/urbannava-report-urbannava-before.mp3</a></li>
+<li><a href="../out/audio/urbannava-report-urbannava-before.txt">out/audio/urbannava-report-urbannava-before.txt</a></li></ul>
 </main>
 </body>
 </html>

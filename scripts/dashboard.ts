@@ -84,15 +84,26 @@ function renderReportCards(reports: RemediationReport[]): string {
     .map((report) => {
       const beforeScore = report.before.judgment?.score ?? 'skipped';
       const afterScore = report.after.judgment?.score ?? 'skipped';
+      const violationsLabel = `Axe violations: ${report.verify.beforeViolationCount} to ${report.verify.afterViolationCount}`;
+      const keysLabel = `Violation keys: ${report.verify.removedViolationKeys.length} removed, ${report.verify.addedViolationKeys.length} added`;
+      const comprehensionLabel = `Comprehension: ${beforeScore} to ${afterScore}`;
+      const flaggedLabel = `Flagged for human: ${report.flaggedItems.length}`;
+      // Stat tiles split the number and label into separate elements for the
+      // visual layout, but neither <strong> nor <span> exposes an accessible
+      // name from its sibling's text — narrate.ts's live audit found the
+      // dashboard's own comprehension score at 2/5 because of exactly this:
+      // labels reached the screen-reader narration, the numbers next to them
+      // didn't. role="group" + aria-label carries one combined, coherent
+      // announcement regardless of how the visual children get parsed.
       return `
         <article class="card">
           <h3>${escapeHtml(report.target.label)}</h3>
           <p class="muted">${escapeHtml(report.target.url)}</p>
           <div class="metrics">
-            <div><strong>${report.verify.beforeViolationCount} -> ${report.verify.afterViolationCount}</strong><span>Axe violations</span></div>
-            <div><strong>-${report.verify.removedViolationKeys.length} +${report.verify.addedViolationKeys.length}</strong><span>Violation keys</span></div>
-            <div><strong>${escapeHtml(beforeScore)} -> ${escapeHtml(afterScore)}</strong><span>Comprehension</span></div>
-            <div><strong>${report.flaggedItems.length}</strong><span>Flagged for human</span></div>
+            <div role="group" aria-label="${escapeHtml(violationsLabel)}"><strong aria-hidden="true">${report.verify.beforeViolationCount} -> ${report.verify.afterViolationCount}</strong><span aria-hidden="true">Axe violations</span></div>
+            <div role="group" aria-label="${escapeHtml(keysLabel)}"><strong aria-hidden="true">-${report.verify.removedViolationKeys.length} +${report.verify.addedViolationKeys.length}</strong><span aria-hidden="true">Violation keys</span></div>
+            <div role="group" aria-label="${escapeHtml(comprehensionLabel)}"><strong aria-hidden="true">${escapeHtml(beforeScore)} -> ${escapeHtml(afterScore)}</strong><span aria-hidden="true">Comprehension</span></div>
+            <div role="group" aria-label="${escapeHtml(flaggedLabel)}"><strong aria-hidden="true">${report.flaggedItems.length}</strong><span aria-hidden="true">Flagged for human</span></div>
           </div>
         </article>`;
     })
@@ -186,11 +197,13 @@ function main() {
 
   <h2>Braintrust Metrics</h2>
   <table>
+    <caption class="muted">Violations and Comprehension show axe violation count and Grader B's 1-5 narration comprehension score, each as before &#8594; after. Delta is the net change in violation count. Fix Rate is the share of proposed patches that were kept (not reverted). Flag Rate is the share of semantic violations the LLM tier declined to guess at and flagged for human review instead.</caption>
     <thead><tr><th>Target</th><th>Violations</th><th>Delta</th><th>No Regression</th><th>Fix Rate</th><th>Flag Rate</th><th>Comprehension</th></tr></thead>
     <tbody>${renderBraintrust(braintrust)}</tbody>
   </table>
 
   <h2>Daytona Sandbox Evidence</h2>
+  <p class="muted">One isolated sandbox per target, running an untrusted-execution scan. Sandbox is the Daytona sandbox id; Exit is the scan process's exit code (0 = ran successfully); the block below is its raw stdout/stderr.</p>
   <section class="grid">${renderDaytona(daytona)}</section>
 
   <h2>Audio / Narration Artifacts</h2>
