@@ -49,6 +49,10 @@ function gitAvailable(): boolean {
   }
 }
 
+function branchTimestamp(): string {
+  return new Date().toISOString().replace(/[-:]/g, '').replace(/\..+$/, '').replace('T', '-');
+}
+
 function ghAuthed(): boolean {
   try {
     sh('gh', ['auth', 'status']);
@@ -160,7 +164,7 @@ export async function emitPatch(
     }
 
     const originalBranch = sh('git', ['rev-parse', '--abbrev-ref', 'HEAD']);
-    const branch = `fix/a11y-${site}`;
+    const branch = `fix/a11y-${site}-${branchTimestamp()}`;
 
     try {
       sh('git', ['checkout', '-B', branch]);
