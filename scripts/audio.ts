@@ -135,6 +135,83 @@ async function withTimeout<T>(promise: Promise<T>, label: string): Promise<T> {
   }
 }
 
+// ElevenLabs' TTS endpoint hard-rejects text over this length (verified via a
+// real 400: "Request text length (14338) exceeds the maximum text length of
+// 10000 characters"). A text-heavy site's narration can exceed it even though
+// narrate.ts caps by line count, not character count. Two-step fail-safe so a
+// long transcript never blocks the mp3 the same way a missing key doesn't:
+// try an LLM condense first (keeps every "unlabeled"/"blank" gap line, since
+// those are the signal), then hard-truncate at a line boundary regardless.
+const ELEVENLABS_MAX_CHARS = 10_000;
+const SUMMARIZE_TARGET_CHARS = 9_000;
+
+async function summarizeTranscript(transcript: string): Promise<string | null> {
+  const key = process.env.FIREWORKS_API_KEY;
+  if (!key) return null;
+
+  const model = process.env.FIREWORKS_SMALL_MODEL ?? 'accounts/fireworks/models/gpt-oss-120b';
+  const baseUrl = process.env.FIREWORKS_BASE_URL ?? 'https://api.fireworks.ai/inference/v1';
+
+  const prompt = `Condense the following screen-reader narration transcript to under ${SUMMARIZE_TARGET_CHARS} characters so it fits a text-to-speech character limit.
+
+Rules:
+- Keep every line containing "unlabeled" or "blank" verbatim, in order — those are the accessibility gaps this transcript exists to surface. Never summarize or drop them.
+- Condense everything else: collapse long runs of similar links/list items into a shorter representative line (e.g. "12 more links: ..." style), shorten verbose paragraph text.
+- Preserve overall reading order.
+- Output only the condensed transcript. No commentary, no JSON, no surrounding quotes.
+
+Transcript:
+"""
+${transcript}
+"""`;
+
+  try {
+    const res = await fetch(`${baseUrl}/chat/completions`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${key}` },
+      body: JSON.stringify({
+        model,
+        temperature: 0,
+        max_tokens: 4000,
+        messages: [{ role: 'user', content: prompt }],
+      }),
+    });
+    if (!res.ok) return null;
+    const data = (await res.json()) as { choices?: Array<{ message?: { content?: string } }> };
+    const content = data.choices?.[0]?.message?.content?.trim();
+    return content && content.length > 0 ? content : null;
+  } catch {
+    return null;
+  }
+}
+
+function hardTruncate(transcript: string, limit: number): string {
+  if (transcript.length <= limit) return transcript;
+  const suffix = '\n… (trimmed to fit ElevenLabs character limit)';
+  const budget = Math.max(0, limit - suffix.length);
+  const cut = transcript.slice(0, budget);
+  const lastBreak = cut.lastIndexOf('\n');
+  const clean = lastBreak > 0 ? cut.slice(0, lastBreak) : cut;
+  return `${clean}${suffix}`;
+}
+
+/**
+ * Never let a too-long transcript block the mp3. Try condensing it with an
+ * LLM call first (best result — real content stays intelligible); if that's
+ * unavailable, fails, or still doesn't fit, hard-truncate at a line boundary
+ * as the unconditional final fail-safe.
+ */
+async function fitForTts(transcript: string): Promise<{ text: string; trimmed: 'none' | 'summarized' | 'truncated' }> {
+  if (transcript.length <= ELEVENLABS_MAX_CHARS) return { text: transcript, trimmed: 'none' };
+
+  const summarized = await summarizeTranscript(transcript);
+  if (summarized && summarized.length <= ELEVENLABS_MAX_CHARS) {
+    return { text: summarized, trimmed: 'summarized' };
+  }
+
+  return { text: hardTruncate(summarized ?? transcript, ELEVENLABS_MAX_CHARS), trimmed: 'truncated' };
+}
+
 function outputFormat(): ElevenLabs.TextToSpeechConvertRequestOutputFormat {
   const value = process.env.ELEVENLABS_OUTPUT_FORMAT;
   if (!value) return DEFAULT_OUTPUT_FORMAT;
@@ -191,10 +268,17 @@ async function writeAudioResponse(audio: unknown, path: string): Promise<void> {
 async function synthesizeWithElevenLabs(clip: Clip, sourcePath: string): Promise<string> {
   const client = new ElevenLabsClient();
   const path = audioPath(clip, sourcePath);
+  const fit = await fitForTts(clip.transcript);
+
+  if (fit.trimmed !== 'none') {
+    console.log(
+      `  transcript is ${clip.transcript.length} chars (over the ${ELEVENLABS_MAX_CHARS} limit) — ${fit.trimmed} to ${fit.text.length} chars for TTS`,
+    );
+  }
 
   const audio = await withTimeout(
     client.textToSpeech.convert(process.env.ELEVENLABS_VOICE_ID ?? DEFAULT_VOICE_ID, {
-      text: clip.transcript,
+      text: fit.text,
       modelId: process.env.ELEVENLABS_MODEL_ID ?? DEFAULT_MODEL_ID,
       outputFormat: outputFormat(),
     }),
