@@ -1,0 +1,8 @@
+node_modules/
+tasks/
+.env
+.env.local
+out/
+patches/
+*.log
+.DS_Store

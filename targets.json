@@ -1,0 +1,7 @@
+{
+  "note": "Frozen target list. Real orgs, sympathetic, mostly static, no login wall. Vet with `npx tsx scripts/probe-targets.ts <url>` before freezing. `fallbacks` are known-good stand-ins if a primary hangs on the day.",
+  "targets": [
+    { "id": "example", "url": "https://example.com", "label": "IANA example page (smoke-test placeholder)" }
+  ],
+  "fallbacks": []
+}
