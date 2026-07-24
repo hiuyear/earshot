@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Earshot Evidence Dashboard</title>
+  <style>
+    :root { color-scheme: dark; font-family: Inter, system-ui, sans-serif; background: #0b1020; color: #eef2ff; }
+    body { margin: 0; padding: 32px; }
+    main { max-width: 1120px; margin: 0 auto; }
+    h1 { font-size: 42px; margin-bottom: 8px; }
+    h2 { margin-top: 36px; }
+    a { color: #93c5fd; }
+    .muted { color: #a5b4fc; }
+    .grid { display: grid; gap: 16px; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); }
+    .card { background: #111827; border: 1px solid #334155; border-radius: 18px; padding: 20px; box-shadow: 0 16px 48px #0005; }
+    .metrics { display: grid; gap: 12px; grid-template-columns: repeat(2, minmax(0, 1fr)); margin-top: 16px; }
+    .metrics div { background: #020617; border-radius: 12px; padding: 12px; }
+    .metrics strong { display: block; font-size: 22px; }
+    .metrics span { color: #cbd5e1; font-size: 13px; }
+    table { width: 100%; border-collapse: collapse; background: #111827; border-radius: 18px; overflow: hidden; }
+    th, td { padding: 12px; border-bottom: 1px solid #334155; text-align: left; }
+    th { color: #bfdbfe; background: #1e293b; }
+    pre { white-space: pre-wrap; background: #020617; border-radius: 12px; padding: 12px; color: #d1d5db; }
+    .warning { border-left: 4px solid #f59e0b; padding-left: 16px; color: #fde68a; }
+  </style>
+</head>
+<body>
+<main>
+  <h1>Earshot Evidence Dashboard</h1>
+  <p class="muted">Reviewable patches with verification evidence. This dashboard does not claim compliance.</p>
+  <p class="warning">Generated from local artifacts at 2026-07-24T21:30:01.769Z.</p>
+
+  <h2>Remediation Report</h2>
+  <section class="grid">
+        <article class="card">
+          <h3>https://www.gov.uk/</h3>
+          <p class="muted">https://www.gov.uk/</p>
+          <div class="metrics">
+            <div><strong>2 -> 2</strong><span>Axe violations</span></div>
+            <div><strong>-0 +0</strong><span>Violation keys</span></div>
+            <div><strong>skipped -> skipped</strong><span>Comprehension</span></div>
+            <div><strong>0</strong><span>Flagged for human</span></div>
+          </div>
+        </article></section>
+
+  <h2>Braintrust Metrics</h2>
+  <table>
+    <thead><tr><th>Target</th><th>Violations</th><th>Delta</th><th>No Regression</th><th>Fix Rate</th><th>Flag Rate</th><th>Comprehension</th></tr></thead>
+    <tbody>
+        <tr>
+          <td>adhoc</td>
+          <td>2 -> 2</td>
+          <td>0</td>
+          <td>yes</td>
+          <td>0%</td>
+          <td>0%</td>
+          <td>skipped -> skipped</td>
+        </tr></tbody>
+  </table>
+
+  <h2>Daytona Sandbox Evidence</h2>
+  <section class="grid">
+        <article class="card">
+          <h3>urbannava — daytona</h3>
+          <p><strong>Sandbox:</strong> be9c41d5-6e7f-42ef-8bd8-66fdddfe1cdc</p>
+          <p><strong>Exit:</strong> 0</p>
+          <pre>{&quot;isolated&quot;:true,&quot;targetId&quot;:&quot;urbannava&quot;,&quot;url&quot;:&quot;https://urbannava.gov/&quot;,&quot;runtime&quot;:&quot;v25.9.0&quot;}
+npm notice
+npm notice New minor version of npm available! 11.12.1 -&gt; 11.18.0
+npm notice Changelog: https://github.com/npm/cli/releases/tag/v11.18.0
+npm notice To update run: npm install -g npm@11.18.0
+npm notice
+</pre>
+        </article></section>
+
+  <h2>Audio / Narration Artifacts</h2>
+  <ul><li><a href="../out/audio/phase2-1784925995566-adhoc-after.mp3">out/audio/phase2-1784925995566-adhoc-after.mp3</a></li>
+<li><a href="../out/audio/phase2-1784925995566-adhoc-after.txt">out/audio/phase2-1784925995566-adhoc-after.txt</a></li>
+<li><a href="../out/audio/phase2-1784925995566-adhoc-before.mp3">out/audio/phase2-1784925995566-adhoc-before.mp3</a></li>
+<li><a href="../out/audio/phase2-1784925995566-adhoc-before.txt">out/audio/phase2-1784925995566-adhoc-before.txt</a></li></ul>
+</main>
+</body>
+</html>

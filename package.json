@@ -4,9 +4,12 @@
   "description": "Finds websites blind users cannot navigate, generates reviewable patches, and verifies each fix by listening to the page.",
   "scripts": {
     "audit": "tsx src/index.ts",
+    "audio": "tsx scripts/audio.ts",
+    "braintrust": "tsx scripts/braintrust.ts",
+    "sandbox": "tsx scripts/sandbox.ts",
     "typecheck": "tsc --noEmit",
     "test": "echo \"no tests yet\" && exit 0",
-    "dashboard": "echo \"dashboard not built yet\" && exit 0"
+    "dashboard": "tsx scripts/dashboard.ts"
   },
   "repository": {
     "type": "git",
@@ -27,6 +30,8 @@
   },
   "dependencies": {
     "@axe-core/playwright": "^4.12.1",
+    "@elevenlabs/elevenlabs-js": "^2.59.0",
+    "braintrust": "^3.24.0",
     "dotenv": "^17.4.2",
     "playwright": "^1.61.1",
     "zod": "^4.4.3"

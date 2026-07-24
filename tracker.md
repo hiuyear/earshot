@@ -6,7 +6,8 @@ count (cheap, mechanical, ~30% of barriers); B = narration comprehension (the
 contribution — judge a page from *only* the linear screen-reader output).
 
 **Team:** two people. Ownership + branch map + merge protocol in committed `TEAM.md`
-(Hiuyan → `feat/remediation`, Phases 2–3; teammate → `feat/evidence`, sponsor layer).
+(`phase-1` → product core in `src/`; `phase-2` → sponsor evidence in `scripts/`
+and later `dashboard/`).
 
 ## Phase status
 
@@ -109,6 +110,66 @@ dropped by the same rule as Grader B.
   known-loading target is enough to prove the loop before expanding the dataset.
 - **Interview line:** "I froze the smallest target set that protected the demo path,
   then left dataset expansion as a separate sponsor/evidence task."
+
+### D9 — ElevenLabs SDK with text fallback for audio evidence
+- **Alternatives:**
+  - *Raw REST call* — avoids a dependency, but adds hand-rolled binary stream handling
+    under hackathon time pressure.
+  - *Official `@elevenlabs/elevenlabs-js` SDK* (chosen) — adds one package, but the docs
+    confirm it reads `ELEVENLABS_API_KEY` and returns a stream suitable for writing MP3s.
+- **Why for this project:** the sponsor audio layer is a demo artifact, not the core
+  accessibility engine; the fastest defensible path is official SDK + a non-blocking
+  `.txt` fallback so invalid/missing TTS keys never block the video script.
+- **Evidence:** `npm run audio -- out/phase2-1784925995566.json` writes before/after
+  text fallbacks and MP3 files. The SDK returned a Blob-like response rather than the
+  Node stream shown in docs, so `scripts/audio.ts` handles streams, Web streams,
+  Blob/ArrayBuffer responses, and timeouts.
+- **Interview line:** "The audio layer is allowed to fail soft: text narration is the
+  source of truth, and TTS is a presentation artifact."
+
+### D10 — Braintrust experiment logs from saved remediation reports
+- **Alternatives:**
+  - *Wait for final Phase 2 five-target output* — cleaner final screenshot, but blocks
+    sponsor evidence on product-core timing.
+  - *Log metrics from any saved `RemediationReport` now* (chosen) — current gov.uk
+    report has weak improvement numbers, but proves the Braintrust pipeline and can be
+    rerun unchanged when better reports arrive.
+- **Why for this project:** `phase-2` is supposed to read `out/*.json`, not import
+  product-core code. Logging from saved reports keeps the branch split clean and gives
+  the demo a working Braintrust URL immediately.
+- **Evidence:** `npm run braintrust -- out/phase2-1784925995566.json` wrote local
+  metrics and uploaded experiment `phase-2-phase2-1784925995566` to project `Earshot`.
+- **Interview line:** "Braintrust is downstream of the JSON contract: once a report
+  exists, the metrics layer can run without touching the remediation engine."
+
+### D11 — Daytona REST smoke instead of SDK dependency
+- **Alternatives:**
+  - *Use `@daytona/sdk`* — official and richer, but `npm audit --omit=dev` reports
+    3 high-severity OpenTelemetry findings with no fix available through the SDK path.
+  - *Use Daytona REST endpoints for a smoke proof* (chosen) — less ergonomic and the
+    full scan remains opt-in, but avoids shipping a known vulnerable dependency.
+- **Why for this project:** the Daytona layer is sponsor evidence, not core runtime.
+  A clean dependency tree plus a verified isolated code-run is a better hackathon trade
+  than carrying an unfixed high-severity transitive dependency.
+- **Evidence:** `npm run sandbox` created Daytona sandbox
+  `be9c41d5-6e7f-42ef-8bd8-66fdddfe1cdc`, ran code for `urbannava`, and wrote
+  `out/daytona/sandbox-1784928114683.json` with exit 0.
+- **Interview line:** "I used Daytona where isolation matters, but kept it downstream
+  and optional so a sponsor integration could not make the core build less safe."
+
+### D12 — Static dashboard generated from local evidence artifacts
+- **Alternatives:**
+  - *Build a live app/dashboard* — better interaction, but adds framework/setup time and
+    distracts from the sponsor evidence scripts.
+  - *Generate `dashboard/index.html` from local artifacts* (chosen) — static and simple,
+    but immediately screenshot-able and works without a dev server.
+- **Why for this project:** Phase 2 evidence already lives in local JSON/text artifacts;
+  a generated HTML page is the quickest way to make those artifacts legible for the
+  video and Devpost without changing the core pipeline.
+- **Evidence:** `npm run dashboard` writes `dashboard/index.html` from report,
+  Braintrust, Daytona, and audio/narration artifacts.
+- **Interview line:** "The dashboard is just a presentation layer over saved evidence;
+  it does not become another source of truth."
 
 ## Framing guardrails (hard requirement, spec §8)
 Never "automatically compliant" / "WCAG compliant" / "fully accessible". This project
