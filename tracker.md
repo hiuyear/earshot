@@ -6,7 +6,8 @@ count (cheap, mechanical, ~30% of barriers); B = narration comprehension (the
 contribution — judge a page from *only* the linear screen-reader output).
 
 **Team:** two people. Ownership + branch map + merge protocol in committed `TEAM.md`
-(Hiuyan → `feat/remediation`, Phases 2–3; teammate → `feat/evidence`, sponsor layer).
+(`phase-1` → product core in `src/`; `phase-2` → sponsor evidence in `scripts/`
+and later `dashboard/`).
 
 ## Phase status
 
@@ -99,6 +100,21 @@ dropped by the same rule as Grader B.
   known-loading target is enough to prove the loop before expanding the dataset.
 - **Interview line:** "I froze the smallest target set that protected the demo path,
   then left dataset expansion as a separate sponsor/evidence task."
+
+### D9 — ElevenLabs SDK with text fallback for audio evidence
+- **Alternatives:**
+  - *Raw REST call* — avoids a dependency, but adds hand-rolled binary stream handling
+    under hackathon time pressure.
+  - *Official `@elevenlabs/elevenlabs-js` SDK* (chosen) — adds one package, but the docs
+    confirm it reads `ELEVENLABS_API_KEY` and returns a stream suitable for writing MP3s.
+- **Why for this project:** the sponsor audio layer is a demo artifact, not the core
+  accessibility engine; the fastest defensible path is official SDK + a non-blocking
+  `.txt` fallback so invalid/missing TTS keys never block the video script.
+- **Evidence:** `npm run audio -- out/phase2-1784925995566.json` writes before/after
+  text fallbacks and exits 0; current ElevenLabs key returns 401 `invalid_api_key`, so
+  MP3 output is pending a valid key.
+- **Interview line:** "The audio layer is allowed to fail soft: text narration is the
+  source of truth, and TTS is a presentation artifact."
 
 ## Framing guardrails (hard requirement, spec §8)
 Never "automatically compliant" / "WCAG compliant" / "fully accessible". This project
