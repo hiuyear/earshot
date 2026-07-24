@@ -1,0 +1,16 @@
+--- patches/urbannava/before.html	2026-07-24 16:05:45
++++ patches/urbannava/after.html	2026-07-24 16:05:45
+@@ -1,4 +1,4 @@
+-<!DOCTYPE html><html><head>
++<!DOCTYPE html><html lang=""><head>
+ <meta id="p7HMY" name="viewport" content="width=device-width">
+ <meta charset="UTF-8">
+ <title>Town of Urbanna Governmental Website</title>
+@@ -952,4 +952,4 @@
+ 
+ 
+ 
+-<span class="p7BAM bam-wrapper bam-body"><span class="bam-mask bam-color-none" style="opacity: 0.65;"></span><span class="bam-image bam-type-cover bam-pos-center-center current-slide bam-burns-1 bam-run" style="background-image: url(&quot;img/bkgd/9100-aerialPhoto.jpg&quot;); z-index: 1; visibility: visible; opacity: 1; left: 0px; top: 0px; transition: transform 12s linear, opacity 3s linear;"></span><span class="bam-image bam-type-cover bam-pos-center-center"></span><span class="bam-image bam-type-cover bam-pos-center-center"></span></span><div id="p7PBXov" class="pbx-overlay" style="z-index: 99999995;"></div></body></html>
+\ No newline at end of file
++<span class="p7BAM bam-wrapper bam-body"><span class="bam-mask bam-color-none" style="opacity: 0.65;"></span><span class="bam-image bam-type-cover bam-pos-center-center current-slide bam-burns-5 bam-run" style="background-image: url(&quot;img/bkgd/9100-aerialPhoto.jpg&quot;); z-index: 1; visibility: visible; opacity: 1; left: 0px; top: 0px; transition: transform 12s linear, opacity 3s linear;"></span><span class="bam-image bam-type-cover bam-pos-center-center bam-burns-3" style="background-image: url(&quot;img/bkgd/6980-lansdowne.jpg&quot;); z-index: 0; visibility: hidden; opacity: 0; left: 0px; top: 0px;"></span><span class="bam-image bam-type-cover bam-pos-center-center bam-burns-4" style="background-image: url(&quot;img/bkgd/6980-marina_1.jpg&quot;); z-index: 0; visibility: hidden; opacity: 0; left: 0px; top: 0px;"></span></span><div id="p7PBXov" class="pbx-overlay" style="z-index: 99999995;"></div></body></html>
+\ No newline at end of file
