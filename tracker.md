@@ -62,10 +62,20 @@ dropped by the same rule as Grader B.
 
 ### D5 — Fireworks judge: `json_object` + Zod `safeParse`, model id env-overridable
 - OpenAI-compatible (base/header/model-format/response_format all verified against
-  Fireworks docs, not memorised). Default model `deepseek-v3p1` is a confirmed-real
-  serverless id. Docs caveat: json_object mode requires also instructing JSON in the
-  prompt or the model streams whitespace — done. Raw output never trusted: safeParse
-  or the score is dropped, never coerced.
+  Fireworks docs, not memorised). Docs caveat: json_object mode requires also
+  instructing JSON in the prompt or the model streams whitespace — done. Raw output
+  never trusted: safeParse or the score is dropped, never coerced.
+- **Update (first live-key run):** the original default `deepseek-v3p1` 404s —
+  "Model not found, inaccessible, and/or not deployed." Confirmed real ids by
+  calling `GET /v1/models` with the actual account key rather than trusting the
+  earlier "confirmed-real" claim, which was checked against docs, not this account's
+  deployed set. Currently deployed: `kimi-k2p6`, `glm-5p1`, `gpt-oss-120b`,
+  `deepseek-v4-pro`, `glm-5p2`. Judge + LLM-tier large model now default to
+  `deepseek-v4-pro`; LLM-tier small model defaults to `gpt-oss-120b` (smallest of
+  the deployed set — there's no true small/8B model on this account).
+- **Interview line:** "Docs-verified isn't the same as account-verified — the model
+  catalog a key can actually reach is narrower than the docs, so I check
+  `/v1/models` with the real key before trusting a default in production code."
 
 ### D6 — Freeze a shared remediation contract before branch work
 - **Alternatives:**

@@ -84,21 +84,30 @@ export async function revertPatches(page: Page, results: PatchResult[]): Promise
 
     const patch = result.patch;
     try {
-      await page.evaluate((payload) => {
+      // Selectors can go stale between apply and revert (a later patch may have
+      // restructured the DOM). Report whether the revert actually found and
+      // mutated the element — silently succeeding when the selector no longer
+      // resolves would let a still-applied mutation report itself as reverted,
+      // which is exactly the "after numbers are a lie" failure this verifier
+      // exists to prevent (tracker D7).
+      const outcome = await page.evaluate((payload) => {
         const { patch: p, result: r } = payload;
 
         if (p.action === 'setLang') {
           document.documentElement.lang = r.previousValue ?? '';
-          return;
+          return { found: true };
         }
 
         if (p.action === 'insertSkipLink') {
+          // Absent because it was never inserted, or already removed: the goal
+          // state (no skip link) holds either way, so this isn't a stale-selector
+          // failure the way setAttribute/setText are.
           if (r.inserted) document.querySelector('[data-earshot-skip-link="true"]')?.remove();
-          return;
+          return { found: true };
         }
 
         const el = document.querySelector(p.selector);
-        if (!el) return;
+        if (!el) return { found: false };
 
         if (p.action === 'setAttribute') {
           if (r.previousValue === null || r.previousValue === undefined) {
@@ -109,12 +118,23 @@ export async function revertPatches(page: Page, results: PatchResult[]): Promise
         } else if (p.action === 'setText') {
           el.textContent = r.previousText ?? '';
         }
+        return { found: true };
       }, { patch, result });
+
+      if (!outcome.found) {
+        reverted.push({
+          ...result,
+          reverted: false,
+          reason: `revert failed: selector not found (stale): ${'selector' in patch ? patch.selector : ''}`,
+        });
+        continue;
+      }
 
       reverted.push({ ...result, reverted: true, reason: result.reason ?? 'reverted after verification regression' });
     } catch (err) {
       reverted.push({
         ...result,
+        reverted: false,
         reason: `revert failed: ${err instanceof Error ? err.message : String(err)}`,
       });
     }

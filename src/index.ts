@@ -2,9 +2,10 @@ import 'dotenv/config';
 import { readFileSync, mkdirSync, writeFileSync } from 'node:fs';
 import { launch, open, scanPage } from './scan';
 import { judge } from './judge';
-import { planDeterministicPatches } from './plan';
+import { planPatches } from './plan';
 import { applyPatches, revertPatches } from './patch';
 import { verifyRemediation } from './verify';
+import { emitPatch, type EmitResult } from './emit';
 import type { RemediationReport, SiteReport, Target } from './types';
 
 type TargetsFile = { targets: Target[]; fallbacks?: Target[] };
@@ -45,9 +46,10 @@ async function remediateTarget(
   const page = await context.newPage();
   try {
     await open(page, target.url);
+    const htmlBefore = await page.content();
     const scan = await scanPage(page);
     const before = await makeSiteReport(target, scan);
-    const plan = planDeterministicPatches(before.violations);
+    const plan = await planPatches(page, before.violations);
     let patchResults = await applyPatches(page, plan.patches);
     let verification = await verifyRemediation(page, target, before);
 
@@ -56,7 +58,9 @@ async function remediateTarget(
       verification = await verifyRemediation(page, target, before);
     }
 
-    return {
+    const htmlAfter = await page.content();
+
+    const report: RemediationReport = {
       target,
       fetchedAt: new Date().toISOString(),
       before,
@@ -66,8 +70,26 @@ async function remediateTarget(
       flaggedItems: plan.flaggedItems,
       verify: verification.verify,
     };
+
+    const emit = await emitPatch(report, htmlBefore, htmlAfter);
+    reportEmit(target, emit);
+
+    return report;
   } finally {
     await context.close();
+  }
+}
+
+function reportEmit(target: Target, emit: EmitResult) {
+  if (!emit.ok) {
+    console.log(`\nPhase 3 emit — FAILED for ${target.label}: ${emit.error}`);
+    return;
+  }
+  console.log(`\nPhase 3 emit — patch proposal written to ${emit.dir}/ (branch ${emit.branch})`);
+  if (emit.prUrl) {
+    console.log(`  PR opened: ${emit.prUrl}`);
+  } else if (emit.prSkippedReason) {
+    console.log(`  PR not opened: ${emit.prSkippedReason}`);
   }
 }
 

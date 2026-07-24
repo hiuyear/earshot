@@ -17,8 +17,11 @@ import { JudgmentSchema, type Judgment, type Narration } from './types';
  */
 
 const BASE_URL = process.env.FIREWORKS_BASE_URL ?? 'https://api.fireworks.ai/inference/v1';
+// deepseek-v3p1 (previous default) is no longer deployed on this account and 404s —
+// verified live against GET /v1/models with the real key. deepseek-v4-pro is the
+// largest model currently deployed.
 const JUDGE_MODEL =
-  process.env.FIREWORKS_JUDGE_MODEL ?? 'accounts/fireworks/models/deepseek-v3p1';
+  process.env.FIREWORKS_JUDGE_MODEL ?? 'accounts/fireworks/models/deepseek-v4-pro';
 
 const SYSTEM = `You are given the complete linear output a screen reader would produce for a web page. You cannot see the page. Answer only from this text. Return JSON only.`;
 
@@ -63,7 +66,12 @@ export async function judge(narration: Narration): Promise<JudgeOutcome> {
       body: JSON.stringify({
         model: JUDGE_MODEL,
         temperature: 0,
-        max_tokens: 900,
+        // Reasoning models on this account are verbose and inconsistent about how
+        // much chain-of-thought they emit before the JSON, even at temperature 0 —
+        // 2500 still truncated the "before" call in testing while "after" succeeded
+        // on the same prompt shape. Generous budget to make truncation rare, not
+        // impossible.
+        max_tokens: 4000,
         response_format: { type: 'json_object' },
         messages: [
           { role: 'system', content: SYSTEM },
