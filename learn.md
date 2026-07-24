@@ -14,3 +14,11 @@ the narration transcript; MP3 is presentation for the video. That is why
 `scripts/audio.ts` always writes `.txt` files first, then attempts TTS only when an
 API key is present, and treats TTS auth/API failure as a skipped MP3 instead of a
 failed build.
+
+## 2026-07-24 — Braintrust as downstream evidence
+
+Braintrust should read the saved `RemediationReport`, not call the scanner or patcher.
+That keeps the team split honest: `phase-1` owns producing reports, `phase-2` owns
+turning reports into sponsor evidence. The first uploaded experiment has flat scores
+because the gov.uk remediation did not improve, but the pipeline is proven and can be
+rerun when a stronger report lands.

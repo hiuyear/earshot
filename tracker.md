@@ -116,6 +116,21 @@ dropped by the same rule as Grader B.
 - **Interview line:** "The audio layer is allowed to fail soft: text narration is the
   source of truth, and TTS is a presentation artifact."
 
+### D10 — Braintrust experiment logs from saved remediation reports
+- **Alternatives:**
+  - *Wait for final Phase 2 five-target output* — cleaner final screenshot, but blocks
+    sponsor evidence on product-core timing.
+  - *Log metrics from any saved `RemediationReport` now* (chosen) — current gov.uk
+    report has weak improvement numbers, but proves the Braintrust pipeline and can be
+    rerun unchanged when better reports arrive.
+- **Why for this project:** `phase-2` is supposed to read `out/*.json`, not import
+  product-core code. Logging from saved reports keeps the branch split clean and gives
+  the demo a working Braintrust URL immediately.
+- **Evidence:** `npm run braintrust -- out/phase2-1784925995566.json` wrote local
+  metrics and uploaded experiment `phase-2-phase2-1784925995566` to project `Earshot`.
+- **Interview line:** "Braintrust is downstream of the JSON contract: once a report
+  exists, the metrics layer can run without touching the remediation engine."
+
 ## Framing guardrails (hard requirement, spec §8)
 Never "automatically compliant" / "WCAG compliant" / "fully accessible". This project
 produces **reviewable patches with verification evidence**; an agent proposes, a human

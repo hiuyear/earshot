@@ -5,6 +5,7 @@
   "scripts": {
     "audit": "tsx src/index.ts",
     "audio": "tsx scripts/audio.ts",
+    "braintrust": "tsx scripts/braintrust.ts",
     "typecheck": "tsc --noEmit",
     "test": "echo \"no tests yet\" && exit 0",
     "dashboard": "echo \"dashboard not built yet\" && exit 0"
@@ -29,6 +30,7 @@
   "dependencies": {
     "@axe-core/playwright": "^4.12.1",
     "@elevenlabs/elevenlabs-js": "^2.59.0",
+    "braintrust": "^3.24.0",
     "dotenv": "^17.4.2",
     "playwright": "^1.61.1",
     "zod": "^4.4.3"
