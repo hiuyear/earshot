@@ -1,7 +1,11 @@
 {
-  "note": "Frozen demo target list. Gov.uk was verified in Phase 1; example.com remains a smoke-test fallback.",
+  "note": "Frozen demo target set (spec §9): 5 real, sympathetic, genuinely broken sites, no login wall, mostly static HTML, verified fast-loading via scripts/probe-targets.ts. gov.uk was the Phase 1 smoke-test target but only has 2 axe violations, so it was replaced. example.com remains a smoke-test fallback.",
   "targets": [
-    { "id": "govuk", "url": "https://www.gov.uk/", "label": "GOV.UK homepage" }
+    { "id": "urbannava", "url": "https://urbannava.gov/", "label": "Town of Urbanna, VA (local government)" },
+    { "id": "mdfoodbank", "url": "https://mdfoodbank.org/", "label": "Maryland Food Bank (nonprofit)" },
+    { "id": "comlib", "url": "https://comlib.org/", "label": "Community Library (nonprofit library)" },
+    { "id": "postfalls", "url": "https://communitylibrary.net/library/post-falls/", "label": "Post Falls Community Library (community library)" },
+    { "id": "csox", "url": "https://www.cs.ox.ac.uk/", "label": "Oxford Computer Science (university department)" }
   ],
   "fallbacks": [
     { "id": "example", "url": "https://example.com", "label": "IANA example page (smoke-test fallback)" }
