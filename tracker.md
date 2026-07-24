@@ -111,8 +111,9 @@ dropped by the same rule as Grader B.
   accessibility engine; the fastest defensible path is official SDK + a non-blocking
   `.txt` fallback so invalid/missing TTS keys never block the video script.
 - **Evidence:** `npm run audio -- out/phase2-1784925995566.json` writes before/after
-  text fallbacks and exits 0; current ElevenLabs key returns 401 `invalid_api_key`, so
-  MP3 output is pending a valid key.
+  text fallbacks and MP3 files. The SDK returned a Blob-like response rather than the
+  Node stream shown in docs, so `scripts/audio.ts` handles streams, Web streams,
+  Blob/ArrayBuffer responses, and timeouts.
 - **Interview line:** "The audio layer is allowed to fail soft: text narration is the
   source of truth, and TTS is a presentation artifact."
 

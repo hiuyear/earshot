@@ -36,3 +36,11 @@ The static dashboard is not another pipeline stage. It reads existing artifacts 
 makes them easier to screenshot: remediation numbers, Braintrust metrics, Daytona
 sandbox proof, and audio/text outputs. The source of truth remains the saved JSON
 reports and sponsor evidence files.
+
+## 2026-07-24 — ElevenLabs response shape
+
+The ElevenLabs key was valid once the 401 disappeared, but the script still skipped
+MP3s because the SDK returned a Blob-like response instead of the Node stream shown in
+the docs snippet. The robust fix was to handle all reasonable binary shapes: Node
+streams, Web streams, Blob/ArrayBuffer, and Uint8Array, plus a timeout so generation
+cannot hang silently.

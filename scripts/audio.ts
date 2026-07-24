@@ -16,6 +16,7 @@ import 'dotenv/config';
 import { createWriteStream, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { basename, join } from 'node:path';
 import { pipeline } from 'node:stream/promises';
+import { Buffer } from 'node:buffer';
 import { ElevenLabsClient } from '@elevenlabs/elevenlabs-js';
 import type { ElevenLabs } from '@elevenlabs/elevenlabs-js';
 import type { RemediationReport, SiteReport } from '../src/types';
@@ -32,6 +33,7 @@ const OUTPUT_DIR = join('out', 'audio');
 const DEFAULT_VOICE_ID = 'JBFqnCBsd6RMkjVDRZzb';
 const DEFAULT_MODEL_ID = 'eleven_multilingual_v2';
 const DEFAULT_OUTPUT_FORMAT: ElevenLabs.TextToSpeechConvertRequestOutputFormat = 'mp3_44100_128';
+const DEFAULT_TIMEOUT_MS = 120_000;
 const OUTPUT_FORMATS = new Set<ElevenLabs.TextToSpeechConvertRequestOutputFormat>([
   'mp3_22050_32',
   'mp3_24000_48',
@@ -105,6 +107,34 @@ function isPipeable(value: unknown): value is NodeJS.ReadableStream {
   return typeof (value as { pipe?: unknown } | null)?.pipe === 'function';
 }
 
+function isBlobLike(value: unknown): value is { arrayBuffer: () => Promise<ArrayBuffer> } {
+  return typeof (value as { arrayBuffer?: unknown } | null)?.arrayBuffer === 'function';
+}
+
+function isWebStream(value: unknown): value is ReadableStream<Uint8Array> {
+  return typeof (value as { getReader?: unknown } | null)?.getReader === 'function';
+}
+
+function timeoutMs(): number {
+  const value = Number.parseInt(process.env.ELEVENLABS_TIMEOUT_MS ?? String(DEFAULT_TIMEOUT_MS), 10);
+  return Number.isFinite(value) && value > 0 ? value : DEFAULT_TIMEOUT_MS;
+}
+
+async function withTimeout<T>(promise: Promise<T>, label: string): Promise<T> {
+  const ms = timeoutMs();
+  let timeout: NodeJS.Timeout | undefined;
+  try {
+    return await Promise.race([
+      promise,
+      new Promise<T>((_, reject) => {
+        timeout = setTimeout(() => reject(new Error(`${label} timed out after ${ms}ms`)), ms);
+      }),
+    ]);
+  } finally {
+    if (timeout) clearTimeout(timeout);
+  }
+}
+
 function outputFormat(): ElevenLabs.TextToSpeechConvertRequestOutputFormat {
   const value = process.env.ELEVENLABS_OUTPUT_FORMAT;
   if (!value) return DEFAULT_OUTPUT_FORMAT;
@@ -116,21 +146,62 @@ function outputFormat(): ElevenLabs.TextToSpeechConvertRequestOutputFormat {
   return DEFAULT_OUTPUT_FORMAT;
 }
 
+async function writeWebStream(stream: ReadableStream<Uint8Array>, path: string): Promise<void> {
+  const reader = stream.getReader();
+  const chunks: Buffer[] = [];
+
+  while (true) {
+    const { done, value } = await reader.read();
+    if (done) break;
+    if (value) chunks.push(Buffer.from(value));
+  }
+
+  writeFileSync(path, Buffer.concat(chunks));
+}
+
+async function writeAudioResponse(audio: unknown, path: string): Promise<void> {
+  if (isPipeable(audio)) {
+    await pipeline(audio, createWriteStream(path));
+    return;
+  }
+
+  if (isWebStream(audio)) {
+    await writeWebStream(audio, path);
+    return;
+  }
+
+  if (isBlobLike(audio)) {
+    writeFileSync(path, Buffer.from(await audio.arrayBuffer()));
+    return;
+  }
+
+  if (audio instanceof ArrayBuffer) {
+    writeFileSync(path, Buffer.from(audio));
+    return;
+  }
+
+  if (audio instanceof Uint8Array) {
+    writeFileSync(path, Buffer.from(audio));
+    return;
+  }
+
+  throw new Error(`ElevenLabs returned unsupported audio response: ${Object.prototype.toString.call(audio)}`);
+}
+
 async function synthesizeWithElevenLabs(clip: Clip, sourcePath: string): Promise<string> {
   const client = new ElevenLabsClient();
   const path = audioPath(clip, sourcePath);
 
-  const audio = await client.textToSpeech.convert(process.env.ELEVENLABS_VOICE_ID ?? DEFAULT_VOICE_ID, {
-    text: clip.transcript,
-    modelId: process.env.ELEVENLABS_MODEL_ID ?? DEFAULT_MODEL_ID,
-    outputFormat: outputFormat(),
-  });
+  const audio = await withTimeout(
+    client.textToSpeech.convert(process.env.ELEVENLABS_VOICE_ID ?? DEFAULT_VOICE_ID, {
+      text: clip.transcript,
+      modelId: process.env.ELEVENLABS_MODEL_ID ?? DEFAULT_MODEL_ID,
+      outputFormat: outputFormat(),
+    }),
+    'ElevenLabs conversion',
+  );
 
-  if (!isPipeable(audio)) {
-    throw new Error('ElevenLabs returned a non-stream audio response');
-  }
-
-  await pipeline(audio, createWriteStream(path));
+  await withTimeout(writeAudioResponse(audio, path), 'ElevenLabs audio write');
   return path;
 }
 
