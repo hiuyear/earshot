@@ -10,12 +10,18 @@ import type { RemediationReport, SiteReport, Target } from './types';
 
 type TargetsFile = { targets: Target[]; fallbacks?: Target[] };
 
+function targetFromArg(url: string): Target {
+  const parsed = new URL(url);
+  const id = parsed.hostname.replace(/^www\./, '').replace(/[^a-z0-9]+/gi, '-').replace(/^-+|-+$/g, '');
+  return { id: id || 'adhoc', url, label: url };
+}
+
 function loadTargets(): Target[] {
   const file = JSON.parse(readFileSync('targets.json', 'utf8')) as TargetsFile;
   // A single URL on argv overrides the frozen list — this is the "one real URL"
   // path the Phase 1 checkpoint asks for.
   const argUrl = process.argv[2];
-  if (argUrl) return [{ id: 'adhoc', url: argUrl, label: argUrl }];
+  if (argUrl) return [targetFromArg(argUrl)];
   return file.targets;
 }
 
