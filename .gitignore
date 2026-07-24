@@ -8,3 +8,4 @@ patches/
 .cache/
 *.log
 .DS_Store
+.gstack/
