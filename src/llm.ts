@@ -21,13 +21,14 @@ import { PatchSchema, type FlaggedItem, type Patch, type Violation, type Violati
  */
 
 const BASE_URL = process.env.FIREWORKS_BASE_URL ?? 'https://api.fireworks.ai/inference/v1';
-// Same confirmed-real id judge.ts already uses for the large tier.
-const LARGE_MODEL = process.env.FIREWORKS_LARGE_MODEL ?? 'accounts/fireworks/models/deepseek-v3p1';
-// Small/fast tier default — not independently re-verified against Fireworks' current
-// serverless catalog before implementing (time-boxed call, see tracker.md). Override
-// with FIREWORKS_SMALL_MODEL if this id is wrong or retired.
-const SMALL_MODEL =
-  process.env.FIREWORKS_SMALL_MODEL ?? 'accounts/fireworks/models/llama-v3p1-8b-instruct';
+// Verified live against GET /v1/models with the real account key — deepseek-v3p1
+// (tracker D5's old default) is no longer deployed and 404s. deepseek-v4-pro is
+// the largest model currently deployed on this account.
+const LARGE_MODEL = process.env.FIREWORKS_LARGE_MODEL ?? 'accounts/fireworks/models/deepseek-v4-pro';
+// Smallest chat-capable model currently deployed on this account (of kimi-k2p6,
+// glm-5p1, gpt-oss-120b, deepseek-v4-pro, glm-5p2) — there's no true small/8B model
+// available, so "small tier" here means smallest of what's actually deployed.
+const SMALL_MODEL = process.env.FIREWORKS_SMALL_MODEL ?? 'accounts/fireworks/models/gpt-oss-120b';
 
 const SMALL_RULES = new Set(['image-alt', 'input-image-alt', 'label', 'button-name', 'link-name']);
 const LARGE_RULES = new Set([
@@ -160,7 +161,7 @@ async function callFireworks(
         body: JSON.stringify({
           model,
           temperature: 0,
-          max_tokens: 400,
+          max_tokens: 1500,
           response_format: { type: 'json_object' },
           messages: [
             { role: 'system', content: SYSTEM },
@@ -204,13 +205,25 @@ function parseResponse(raw: string): CacheEntry | null {
   try {
     parsed = JSON.parse(raw);
   } catch {
-    const match = /\{[\s\S]*\}/.exec(raw);
-    if (!match) return null;
+    // Reasoning models sometimes emit their chain-of-thought before the JSON
+    // despite response_format: json_object — take from the LAST '{' to the last
+    // '}', since the final answer comes after any reasoning prose (which can
+    // itself contain stray braces earlier in the string).
+    const start = raw.lastIndexOf('{');
+    const end = raw.lastIndexOf('}');
+    if (start === -1 || end === -1 || end < start) return null;
     try {
-      parsed = JSON.parse(match[0]);
+      parsed = JSON.parse(raw.slice(start, end + 1));
     } catch {
       return null;
     }
+  }
+
+  // Some models emit {"type": "setAttribute", ...} instead of the requested
+  // {"action": "setAttribute", ...}. Normalize rather than reject — the schema
+  // discriminant is a naming convention, not the model's actual decision.
+  if (parsed && typeof parsed === 'object' && !('action' in parsed) && 'type' in parsed) {
+    parsed = { ...parsed, action: (parsed as { type: unknown }).type };
   }
   const result = LLMResponseSchema.safeParse(parsed);
   return result.success ? result.data : null;
