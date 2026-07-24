@@ -22,3 +22,10 @@ That keeps the team split honest: `phase-1` owns producing reports, `phase-2` ow
 turning reports into sponsor evidence. The first uploaded experiment has flat scores
 because the gov.uk remediation did not improve, but the pipeline is proven and can be
 rerun when a stronger report lands.
+
+## 2026-07-24 — Daytona dependency tradeoff
+
+Official SDKs are not automatically the right dependency if they bring an unfixed
+security finding into a small demo repo. Daytona's SDK installed successfully, but
+`npm audit --omit=dev` showed 3 high-severity findings through OpenTelemetry. The
+REST smoke path still proves isolated execution and keeps the dependency tree clean.

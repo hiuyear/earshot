@@ -6,6 +6,7 @@
     "audit": "tsx src/index.ts",
     "audio": "tsx scripts/audio.ts",
     "braintrust": "tsx scripts/braintrust.ts",
+    "sandbox": "tsx scripts/sandbox.ts",
     "typecheck": "tsc --noEmit",
     "test": "echo \"no tests yet\" && exit 0",
     "dashboard": "echo \"dashboard not built yet\" && exit 0"

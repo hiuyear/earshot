@@ -131,6 +131,21 @@ dropped by the same rule as Grader B.
 - **Interview line:** "Braintrust is downstream of the JSON contract: once a report
   exists, the metrics layer can run without touching the remediation engine."
 
+### D11 — Daytona REST smoke instead of SDK dependency
+- **Alternatives:**
+  - *Use `@daytona/sdk`* — official and richer, but `npm audit --omit=dev` reports
+    3 high-severity OpenTelemetry findings with no fix available through the SDK path.
+  - *Use Daytona REST endpoints for a smoke proof* (chosen) — less ergonomic and the
+    full scan remains opt-in, but avoids shipping a known vulnerable dependency.
+- **Why for this project:** the Daytona layer is sponsor evidence, not core runtime.
+  A clean dependency tree plus a verified isolated code-run is a better hackathon trade
+  than carrying an unfixed high-severity transitive dependency.
+- **Evidence:** `npm run sandbox` created Daytona sandbox
+  `be9c41d5-6e7f-42ef-8bd8-66fdddfe1cdc`, ran code for `urbannava`, and wrote
+  `out/daytona/sandbox-1784928114683.json` with exit 0.
+- **Interview line:** "I used Daytona where isolation matters, but kept it downstream
+  and optional so a sponsor integration could not make the core build less safe."
+
 ## Framing guardrails (hard requirement, spec §8)
 Never "automatically compliant" / "WCAG compliant" / "fully accessible". This project
 produces **reviewable patches with verification evidence**; an agent proposes, a human
